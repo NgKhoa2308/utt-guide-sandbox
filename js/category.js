@@ -162,18 +162,31 @@ function renderPlaces() {
       'khac': 'bg-yellow-100 text-yellow-700'
     }[p.category] || 'bg-gray-100 text-gray-700';
     const isFav = Favorites.has(p.id);
+    const isVisited = Visited.has(p.id);
     const r = Ratings.get(p.id);
     const v = Views.get(p.id);
     const d = getDistance(UTT_LOCATION[0], UTT_LOCATION[1], p.lat, p.lng);
     const dText = d < 1000 ? `${d}m` : `${(d/1000).toFixed(1)}km`;
+    const img = getPlaceImage(p);
 
     return `
       <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden card-hover relative">
-        <div class="h-28 bg-gradient-to-br from-blue-500 to-purple-600 relative flex items-center justify-center">
-          <i class="fas fa-store text-4xl text-white/30"></i>
-          ${p.featured ? '<div class="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-1 rounded-full">⭐ Nổi bật</div>' : ''}
-          <button data-fav-id="${p.id}" onclick="toggleFavorite(${p.id}, event)" class="absolute top-2 right-2 bg-white/90 w-8 h-8 rounded-full flex items-center justify-center shadow hover:scale-110 transition text-lg">${isFav ? '❤️' : '🤍'}</button>
-          <div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full"><i class="fas fa-route mr-1"></i>${dText}</div>
+        <div class="h-36 relative overflow-hidden bg-gray-200 dark:bg-gray-700">
+          <img src="${img}" alt="${p.name}" loading="lazy"
+               class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div style="display:none;background:linear-gradient(135deg,#3b82f6,#8b5cf6);" class="w-full h-full items-center justify-center">
+            <i class="fas fa-store text-5xl text-white/40"></i>
+          </div>
+          ${p.featured ? '<div class="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-1 rounded-full shadow">⭐ Nổi bật</div>' : ''}
+          ${isVisited ? '<div class="absolute top-2 left-2 bg-green-600 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow">✅ Đã đến</div>' : ''}
+          <button data-fav-id="${p.id}" onclick="toggleFavorite(${p.id}, event)" 
+                  class="absolute top-2 right-2 bg-white/90 backdrop-blur w-9 h-9 rounded-full flex items-center justify-center shadow hover:scale-110 transition text-lg">
+            ${isFav ? '❤️' : '🤍'}
+          </button>
+          <div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">
+            <i class="fas fa-route mr-1"></i>${dText}
+          </div>
         </div>
         <a href="detail.html?id=${p.id}" class="block p-4">
           <div class="flex items-center justify-between mb-2">
@@ -241,4 +254,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('clearSearch')?.addEventListener('click', () => {
     document.getElementById('resetFilter').click();
   });
+    document.getElementById('randomBtn')?.addEventListener('click', () => {
+    randomPlace(state.category);
+  });
+  document.getElementById('nearMeBtn')?.addEventListener('click', findNearMe);
 });

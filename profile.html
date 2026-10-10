@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cá nhân - UTT Student Guide</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: 'class' };</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<style>
+  * { font-family: 'Segoe UI', system-ui, sans-serif; }
+  .gradient-header { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 60%, #60a5fa 100%); }
+  .stat-card { transition: transform .3s; }
+  .stat-card:hover { transform: translateY(-4px); }
+  .line-clamp-1 { display:-webkit-box; -webkit-line-clamp:1;line-clamp: 1; -webkit-box-orient:vertical; overflow:hidden; }
+</style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors">
+
+<header class="gradient-header text-white sticky top-0 z-50 shadow-lg">
+  <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-3">
+      <div class="bg-white/20 backdrop-blur rounded-xl p-2.5"><i class="fas fa-map-marked-alt text-2xl"></i></div>
+      <div>
+        <h1 class="text-lg md:text-xl font-bold leading-tight">UTT Student Guide</h1>
+        <p class="text-xs text-blue-100">Cẩm nang số sinh viên UTT</p>
+      </div>
+    </a>
+    <nav class="hidden md:flex items-center gap-5 text-sm font-medium">
+      <a href="index.html" class="hover:text-yellow-300 transition"><i class="fas fa-home mr-1"></i>Trang chủ</a>
+      <a href="category.html" class="hover:text-yellow-300 transition"><i class="fas fa-th-large mr-1"></i>Danh mục</a>
+      <a href="favorites.html" class="hover:text-yellow-300 transition relative">
+        <i class="fas fa-heart mr-1"></i>Yêu thích
+        <span class="fav-badge absolute -top-2 -right-3 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full items-center justify-center font-bold" style="display:none;"></span>
+      </a>
+      <button id="darkModeBtn" class="text-xl hover:scale-110 transition">🌙</button>
+    </nav>
+  </div>
+</header>
+
+<main class="container mx-auto px-4 py-8 max-w-5xl">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold mb-2"><i class="fas fa-user-circle text-blue-600 mr-2"></i>Trang cá nhân</h1>
+    <p class="text-gray-500 dark:text-gray-400">Thống kê hoạt động của bạn trên UTT Student Guide</p>
+  </div>
+
+  <!-- THỐNG KÊ -->
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+    <div class="stat-card bg-white dark:bg-gray-800 rounded-2xl shadow-md p-5 text-center">
+      <div class="text-3xl font-bold text-blue-600 mb-1" id="statViewed">0</div>
+      <div class="text-xs text-gray-500 dark:text-gray-400"><i class="fas fa-eye mr-1"></i>Đã xem</div>
+    </div>
+    <div class="stat-card bg-white dark:bg-gray-800 rounded-2xl shadow-md p-5 text-center">
+      <div class="text-3xl font-bold text-red-500 mb-1" id="statFav">0</div>
+      <div class="text-xs text-gray-500 dark:text-gray-400"><i class="fas fa-heart mr-1"></i>Yêu thích</div>
+    </div>
+    <div class="stat-card bg-white dark:bg-gray-800 rounded-2xl shadow-md p-5 text-center">
+      <div class="text-3xl font-bold text-green-600 mb-1" id="statVisited">0</div>
+      <div class="text-xs text-gray-500 dark:text-gray-400"><i class="fas fa-check-circle mr-1"></i>Đã đến</div>
+    </div>
+    <div class="stat-card bg-white dark:bg-gray-800 rounded-2xl shadow-md p-5 text-center">
+      <div class="text-3xl font-bold text-yellow-500 mb-1" id="statWish">0</div>
+      <div class="text-xs text-gray-500 dark:text-gray-400"><i class="fas fa-star mr-1"></i>Muốn đến</div>
+    </div>
+    <div class="stat-card bg-white dark:bg-gray-800 rounded-2xl shadow-md p-5 text-center">
+      <div class="text-3xl font-bold text-purple-600 mb-1" id="statNotes">0</div>
+      <div class="text-xs text-gray-500 dark:text-gray-400"><i class="fas fa-sticky-note mr-1"></i>Ghi chú</div>
+    </div>
+    <div class="stat-card bg-white dark:bg-gray-800 rounded-2xl shadow-md p-5 text-center">
+      <div class="text-3xl font-bold text-orange-500 mb-1" id="statRatings">0</div>
+      <div class="text-xs text-gray-500 dark:text-gray-400"><i class="fas fa-star-half-alt mr-1"></i>Đã đánh giá</div>
+    </div>
+  </div>
+
+  <!-- TIẾN ĐỘ KHÁM PHÁ -->
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 mb-8">
+    <h2 class="text-xl font-bold mb-4"><i class="fas fa-chart-line text-blue-600 mr-2"></i>Tiến độ khám phá</h2>
+    <div class="mb-2 flex justify-between text-sm">
+      <span class="text-gray-600 dark:text-gray-300">Đã xem <span id="progressCount">0</span>/<span id="progressTotal">12</span> địa điểm</span>
+      <span id="progressPercent" class="font-bold text-blue-600">0%</span>
+    </div>
+    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+      <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-purple-600 h-full transition-all duration-500" style="width:0%"></div>
+    </div>
+    <p id="progressMsg" class="text-sm text-gray-500 dark:text-gray-400 mt-3"></p>
+  </div>
+
+  <!-- LỊCH SỬ XEM -->
+  <section id="viewedSection" class="mb-8 hidden">
+    <h2 class="text-xl font-bold mb-4"><i class="fas fa-history text-blue-600 mr-2"></i>Đã xem gần đây</h2>
+    <div id="viewedList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  </section>
+
+  <!-- ĐÃ ĐẾN -->
+  <section id="visitedSection" class="mb-8 hidden">
+    <h2 class="text-xl font-bold mb-4"><i class="fas fa-check-circle text-green-600 mr-2"></i>Địa điểm đã đến</h2>
+    <div id="visitedList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  </section>
+
+  <!-- MUỐN ĐẾN -->
+  <section id="wishlistSection" class="mb-8 hidden">
+    <h2 class="text-xl font-bold mb-4"><i class="fas fa-star text-yellow-500 mr-2"></i>Địa điểm muốn đến</h2>
+    <div id="wishlistList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  </section>
+
+  <!-- GHI CHÚ -->
+  <section id="notesSection" class="mb-8 hidden">
+    <h2 class="text-xl font-bold mb-4"><i class="fas fa-sticky-note text-yellow-500 mr-2"></i>Ghi chú của bạn</h2>
+    <div id="notesList" class="space-y-3"></div>
+  </section>
+
+  <!-- RESET -->
+  <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-6">
+    <h3 class="font-bold text-red-700 dark:text-red-300 mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Vùng nguy hiểm</h3>
+    <p class="text-sm text-red-600 dark:text-red-400 mb-3">Xóa toàn bộ dữ liệu cá nhân (yêu thích, ghi chú, lịch sử, đã đến, muốn đến).</p>
+    <button onclick="resetAll()" class="bg-red-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-red-700 transition">
+      <i class="fas fa-trash mr-1"></i>Xóa tất cả dữ liệu
+    </button>
+  </div>
+</main>
+
+<footer class="bg-gray-900 dark:bg-black text-white py-5 px-4 mt-8 text-center">
+  <p class="text-xs text-gray-400">&copy; 2025 Nhóm UTT Student Guide</p>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script src="js/profile.js"></script>
+</body>
+</html>

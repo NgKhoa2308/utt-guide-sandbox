@@ -1,220 +1,182 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UTT Student Guide - Cẩm nang số cho sinh viên UTT</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <style>
-    body { font-family: 'Segoe UI', system-ui, sans-serif; }
-    .gradient-header { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%); }
-    .hero-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); }
-    .category-card { transition: all 0.3s ease; }
-    .category-card:hover { transform: translateY(-6px); box-shadow: 0 12px 24px rgba(0,0,0,0.12); }
-    .place-card { transition: all 0.3s ease; }
-    .place-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.15); }
-    .fade-in { animation: fadeIn 0.5s ease-in; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    #map { height: 450px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-    .search-input:focus { box-shadow: 0 0 0 4px rgba(59,130,246,0.2); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTT Student Guide - Cẩm nang số sinh viên UTT</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: 'class' };</script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<style>
+  * { font-family: 'Segoe UI', system-ui, sans-serif; }
+  .gradient-header { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 60%, #60a5fa 100%); }
+  .hero-bg { background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%); }
+  .card-hover { transition: transform .3s, box-shadow .3s; }
+  .card-hover:hover { transform: translateY(-6px); box-shadow: 0 15px 30px rgba(0,0,0,.15); }
+  .fade-in { animation: fadeIn .5s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: translateY(0) } }
+  #map { height: 480px; border-radius: 16px; z-index: 1; }
+  .line-clamp-1 { display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+  .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .active-filter { background:#2563eb !important; color:white !important; }
+  html.dark .leaflet-tile { filter: brightness(.85); }
+</style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors">
 
-  <!-- HEADER -->
-  <header class="gradient-header text-white sticky top-0 z-50 shadow-lg">
-    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-3">
-        <div class="bg-white/20 backdrop-blur rounded-lg p-2">
-          <i class="fas fa-map-marked-alt text-2xl"></i>
-        </div>
-        <div>
-          <h1 class="text-xl font-bold leading-tight">UTT Student Guide</h1>
-          <p class="text-xs text-blue-100">Cẩm nang số sinh viên UTT</p>
-        </div>
+<header class="gradient-header text-white sticky top-0 z-50 shadow-lg">
+  <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-3">
+      <div class="bg-white/20 backdrop-blur rounded-xl p-2.5">
+        <i class="fas fa-map-marked-alt text-2xl"></i>
+      </div>
+      <div>
+        <h1 class="text-lg md:text-xl font-bold leading-tight">UTT Student Guide</h1>
+        <p class="text-xs text-blue-100">Cẩm nang số sinh viên UTT</p>
+      </div>
+    </a>
+    <nav class="hidden md:flex items-center gap-5 text-sm font-medium">
+      <a href="index.html" class="hover:text-yellow-300 transition"><i class="fas fa-home mr-1"></i>Trang chủ</a>
+      <a href="category.html" class="hover:text-yellow-300 transition"><i class="fas fa-th-large mr-1"></i>Danh mục</a>
+      <a href="#map-section" class="hover:text-yellow-300 transition"><i class="fas fa-map mr-1"></i>Bản đồ</a>
+      <a href="favorites.html" class="hover:text-yellow-300 transition relative">
+        <i class="fas fa-heart mr-1"></i>Yêu thích
+        <span class="fav-badge absolute -top-2 -right-3 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full items-center justify-center font-bold" style="display:none;"></span>
       </a>
-      <nav class="hidden md:flex gap-6 text-sm font-medium">
-        <a href="index.html" class="hover:text-yellow-300 transition"><i class="fas fa-home mr-1"></i>Trang chủ</a>
-        <a href="#categories" class="hover:text-yellow-300 transition"><i class="fas fa-th-large mr-1"></i>Danh mục</a>
-        <a href="#map-section" class="hover:text-yellow-300 transition"><i class="fas fa-map mr-1"></i>Bản đồ</a>
-        <a href="https://github.com/NgKhoa2308/utt-student-guide" target="_blank" class="hover:text-yellow-300 transition"><i class="fab fa-github mr-1"></i>GitHub</a>
-      </nav>
-      <button id="menuBtn" class="md:hidden text-2xl"><i class="fas fa-bars"></i></button>
-    </div>
-  </header>
+      <button id="darkModeBtn" class="text-xl hover:scale-110 transition" title="Bật/tắt chế độ tối">🌙</button>
+    </nav>
+    <button id="menuBtn" class="md:hidden text-2xl"><i class="fas fa-bars"></i></button>
+  </div>
+  <div id="mobileMenu" class="hidden md:hidden bg-blue-800 px-4 py-3 space-y-2 text-sm">
+    <a href="index.html" class="block py-1"><i class="fas fa-home mr-2"></i>Trang chủ</a>
+    <a href="category.html" class="block py-1"><i class="fas fa-th-large mr-2"></i>Danh mục</a>
+    <a href="favorites.html" class="block py-1"><i class="fas fa-heart mr-2"></i>Yêu thích</a>
+  </div>
+</header>
 
-  <!-- HERO + SEARCH -->
-  <section class="hero-gradient text-white py-16 px-4 relative overflow-hidden">
-    <div class="absolute inset-0 opacity-10">
-      <div class="absolute top-10 left-10 text-9xl"><i class="fas fa-map-pin"></i></div>
-      <div class="absolute bottom-10 right-10 text-9xl"><i class="fas fa-compass"></i></div>
-    </div>
-    <div class="container mx-auto text-center relative z-10">
-      <h1 class="text-3xl md:text-5xl font-bold mb-4 fade-in">
-        Tìm nhanh địa điểm quanh UTT
-      </h1>
-      <p class="text-blue-100 mb-8 text-lg fade-in">
-        Ăn uống, photocopy, sửa xe, nhà thuốc, học nhóm... tất cả trong một
-      </p>
-
-      <div class="max-w-2xl mx-auto fade-in">
-        <div class="flex bg-white rounded-2xl overflow-hidden shadow-2xl">
-          <div class="flex items-center pl-5 text-gray-400">
-            <i class="fas fa-search"></i>
-          </div>
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="VD: photocopy, quán ăn 30k, nhà thuốc..."
-            class="flex-1 px-4 py-4 text-gray-800 outline-none search-input"
-          >
-          <button
-            id="searchBtn"
-            class="bg-yellow-400 text-blue-900 px-8 font-bold hover:bg-yellow-300 transition"
-          >
-            Tìm
-          </button>
-        </div>
-        <div class="flex flex-wrap gap-2 mt-4 justify-center text-sm">
-          <span class="text-blue-200 py-1">Gợi ý:</span>
-          <button class="quick-search bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-1 rounded-full transition" data-keyword="photocopy">
-            <i class="fas fa-print mr-1"></i>photocopy
-          </button>
-          <button class="quick-search bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-1 rounded-full transition" data-keyword="cơm">
-            <i class="fas fa-utensils mr-1"></i>cơm
-          </button>
-          <button class="quick-search bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-1 rounded-full transition" data-keyword="nhà thuốc">
-            <i class="fas fa-pills mr-1"></i>nhà thuốc
-          </button>
-          <button class="quick-search bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-1 rounded-full transition" data-keyword="học nhóm">
-            <i class="fas fa-book mr-1"></i>học nhóm
-          </button>
-        </div>
+<section class="hero-bg text-white py-16 px-4 relative overflow-hidden">
+  <div class="absolute -top-10 -left-10 text-[10rem] opacity-10"><i class="fas fa-map-pin"></i></div>
+  <div class="absolute -bottom-10 -right-10 text-[10rem] opacity-10"><i class="fas fa-compass"></i></div>
+  <div class="container mx-auto text-center relative z-10">
+    <h1 class="text-3xl md:text-5xl font-bold mb-3 fade-in">Tìm nhanh địa điểm quanh UTT</h1>
+    <p class="text-blue-100 mb-8 text-base md:text-lg fade-in">Ăn uống, photocopy, sửa xe, nhà thuốc, học nhóm... tất cả trong một</p>
+    <div class="max-w-2xl mx-auto relative fade-in">
+      <div class="flex bg-white rounded-2xl overflow-hidden shadow-2xl">
+        <div class="flex items-center pl-5 text-gray-400"><i class="fas fa-search"></i></div>
+        <input type="text" id="searchInput" placeholder="VD: photocopy, cơm 30k, nhà thuốc..." autocomplete="off"
+               class="flex-1 px-4 py-4 text-gray-800 outline-none">
+        <button id="searchBtn" class="bg-yellow-400 text-blue-900 px-6 md:px-8 font-bold hover:bg-yellow-300 transition">Tìm</button>
+      </div>
+      <div id="suggestions" class="hidden absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-2xl overflow-hidden z-30 text-left"></div>
+      <div class="flex flex-wrap gap-2 mt-4 justify-center text-sm">
+        <span class="text-blue-200 py-1">Gợi ý:</span>
+        <button class="quick-search bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-1 rounded-full transition" data-keyword="photocopy"><i class="fas fa-print mr-1"></i>photocopy</button>
+        <button class="quick-search bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-1 rounded-full transition" data-keyword="cơm"><i class="fas fa-utensils mr-1"></i>cơm</button>
+        <button class="quick-search bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-1 rounded-full transition" data-keyword="nhà thuốc"><i class="fas fa-pills mr-1"></i>nhà thuốc</button>
+        <button class="quick-search bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-1 rounded-full transition" data-keyword="học nhóm"><i class="fas fa-book mr-1"></i>học nhóm</button>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- THỐNG KÊ -->
-  <section class="container mx-auto px-4 -mt-8 relative z-20">
-    <div class="bg-white rounded-2xl shadow-xl p-6 grid grid-cols-3 gap-4 text-center">
+<section class="container mx-auto px-4 -mt-8 relative z-20">
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 grid grid-cols-3 gap-4 text-center">
+    <div>
+      <div class="text-2xl md:text-3xl font-bold text-blue-600" id="statPlaces">12</div>
+      <div class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1"><i class="fas fa-map-marker-alt mr-1"></i>Địa điểm</div>
+    </div>
+    <div class="border-x border-gray-100 dark:border-gray-700">
+      <div class="text-2xl md:text-3xl font-bold text-blue-600">7</div>
+      <div class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1"><i class="fas fa-th-large mr-1"></i>Danh mục</div>
+    </div>
+    <div>
+      <div class="text-2xl md:text-3xl font-bold text-blue-600">24/7</div>
+      <div class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1"><i class="fas fa-clock mr-1"></i>Truy cập</div>
+    </div>
+  </div>
+</section>
+
+<section id="historySection" class="container mx-auto px-4 py-8 hidden">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-xl md:text-2xl font-bold"><i class="fas fa-history text-blue-600 mr-2"></i>Vừa xem</h2>
+    <button onclick="clearHistory()" class="text-xs text-gray-500 hover:text-red-600"><i class="fas fa-trash mr-1"></i>Xóa</button>
+  </div>
+  <div id="historyGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+</section>
+
+<section id="categories" class="container mx-auto px-4 py-8">
+  <div class="text-center mb-8">
+    <h2 class="text-2xl md:text-3xl font-bold mb-2">Khám phá theo danh mục</h2>
+    <p class="text-gray-500 dark:text-gray-400">Chọn danh mục để xem các địa điểm phù hợp</p>
+  </div>
+  <div id="categoriesGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4"></div>
+</section>
+
+<section class="bg-white dark:bg-gray-800 py-10">
+  <div class="container mx-auto px-4">
+    <div class="flex items-center justify-between mb-6">
       <div>
-        <div class="text-2xl md:text-3xl font-bold text-blue-600" id="statPlaces">12</div>
-        <div class="text-xs md:text-sm text-gray-500 mt-1"><i class="fas fa-map-marker-alt mr-1"></i>Địa điểm</div>
+        <h2 class="text-2xl md:text-3xl font-bold mb-1"><i class="fas fa-star text-yellow-500 mr-2"></i>Địa điểm nổi bật</h2>
+        <p class="text-gray-500 dark:text-gray-400 text-sm">Những địa điểm được sinh viên yêu thích nhất</p>
       </div>
-      <div class="border-x border-gray-100">
-        <div class="text-2xl md:text-3xl font-bold text-blue-600" id="statCategories">7</div>
-        <div class="text-xs md:text-sm text-gray-500 mt-1"><i class="fas fa-th-large mr-1"></i>Danh mục</div>
+      <a href="category.html" class="hidden md:inline-block text-blue-600 hover:text-blue-800 font-semibold text-sm">Xem tất cả <i class="fas fa-arrow-right ml-1"></i></a>
+    </div>
+    <div id="featuredGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    <div class="text-center mt-6 md:hidden">
+      <a href="category.html" class="inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm">Xem tất cả</a>
+    </div>
+  </div>
+</section>
+
+<section id="map-section" class="container mx-auto px-4 py-10">
+  <div class="text-center mb-6">
+    <h2 class="text-2xl md:text-3xl font-bold mb-1"><i class="fas fa-map text-blue-600 mr-2"></i>Bản đồ địa điểm</h2>
+    <p class="text-gray-500 dark:text-gray-400 text-sm">Click marker để xem chi tiết</p>
+  </div>
+  <div id="map" class="shadow-lg"></div>
+</section>
+
+<footer class="bg-gray-900 dark:bg-black text-white py-10 px-4 mt-8">
+  <div class="container mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-6">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <div class="bg-blue-600 rounded-lg p-2"><i class="fas fa-map-marked-alt"></i></div>
+          <h3 class="text-lg font-bold">UTT Student Guide</h3>
+        </div>
+        <p class="text-gray-400 text-sm">Cẩm nang số giúp sinh viên UTT tìm nhanh các địa điểm và dịch vụ quanh trường.</p>
       </div>
       <div>
-        <div class="text-2xl md:text-3xl font-bold text-blue-600">24/7</div>
-        <div class="text-xs md:text-sm text-gray-500 mt-1"><i class="fas fa-clock mr-1"></i>Truy cập</div>
+        <h4 class="font-bold mb-3">Liên kết</h4>
+        <ul class="space-y-1.5 text-sm text-gray-400">
+          <li><a href="index.html" class="hover:text-white transition">Trang chủ</a></li>
+          <li><a href="category.html" class="hover:text-white transition">Danh mục</a></li>
+          <li><a href="favorites.html" class="hover:text-white transition">Yêu thích</a></li>
+          <li><a href="https://github.com/NgKhoa2308/utt-student-guide" target="_blank" class="hover:text-white transition"><i class="fab fa-github mr-1"></i>GitHub</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold mb-3">Liên hệ</h4>
+        <ul class="space-y-1.5 text-sm text-gray-400">
+          <li><i class="fas fa-university mr-2"></i>ĐH Giao thông Vận tải</li>
+          <li><i class="fas fa-map-marker-alt mr-2"></i>54 Triều Khúc, Thanh Xuân</li>
+          <li><i class="fas fa-envelope mr-2"></i>uttguide@example.com</li>
+        </ul>
       </div>
     </div>
-  </section>
+    <div class="border-t border-gray-800 pt-5 text-center text-xs text-gray-500">
+      <p>&copy; 2025 Nhóm UTT Student Guide. Made with <i class="fas fa-heart text-red-500"></i> bởi sinh viên UTT.</p>
+    </div>
+  </div>
+</footer>
 
-  <!-- DANH MỤC -->
-  <section id="categories" class="container mx-auto px-4 py-12">
-    <div class="text-center mb-8">
-      <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Khám phá theo danh mục</h2>
-      <p class="text-gray-500">Chọn danh mục để xem các địa điểm phù hợp</p>
-    </div>
-    <div id="categoriesGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-      <!-- Render bằng JS -->
-    </div>
-  </section>
-
-  <!-- ĐỊA ĐIỂM NỔI BẬT -->
-  <section class="bg-white py-12">
-    <div class="container mx-auto px-4">
-      <div class="flex items-center justify-between mb-8">
-        <div>
-          <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
-            <i class="fas fa-star text-yellow-500 mr-2"></i>Địa điểm nổi bật
-          </h2>
-          <p class="text-gray-500">Những địa điểm được sinh viên yêu thích nhất</p>
-        </div>
-        <a href="category.html" class="hidden md:inline-block text-blue-600 hover:text-blue-800 font-semibold transition">
-          Xem tất cả <i class="fas fa-arrow-right ml-1"></i>
-        </a>
-      </div>
-      <div id="featuredGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Render bằng JS -->
-      </div>
-      <div class="text-center mt-8 md:hidden">
-        <a href="category.html" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold">
-          Xem tất cả <i class="fas fa-arrow-right ml-1"></i>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BẢN ĐỒ -->
-  <section id="map-section" class="container mx-auto px-4 py-12">
-    <div class="text-center mb-8">
-      <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
-        <i class="fas fa-map text-blue-600 mr-2"></i>Bản đồ địa điểm
-      </h2>
-      <p class="text-gray-500">Click marker để xem thông tin chi tiết</p>
-    </div>
-    <div id="map"></div>
-    <div class="flex flex-wrap gap-4 justify-center mt-4 text-sm">
-      <div class="flex items-center gap-2">
-        <div class="w-4 h-4 rounded-full bg-blue-600"></div>
-        <span class="text-gray-600">Trường UTT</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <div class="w-4 h-4 rounded-full bg-red-500"></div>
-        <span class="text-gray-600">Địa điểm</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer class="bg-gray-900 text-white py-12 px-4 mt-12">
-    <div class="container mx-auto">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-        <div>
-          <div class="flex items-center gap-2 mb-4">
-            <div class="bg-blue-600 rounded-lg p-2">
-              <i class="fas fa-map-marked-alt"></i>
-            </div>
-            <h3 class="text-xl font-bold">UTT Student Guide</h3>
-          </div>
-          <p class="text-gray-400 text-sm">
-            Cẩm nang số giúp sinh viên UTT tìm nhanh các địa điểm và dịch vụ cần thiết xung quanh trường.
-          </p>
-        </div>
-        <div>
-          <h4 class="font-bold mb-4">Liên kết</h4>
-          <ul class="space-y-2 text-sm text-gray-400">
-            <li><a href="index.html" class="hover:text-white transition"><i class="fas fa-chevron-right mr-2 text-xs"></i>Trang chủ</a></li>
-            <li><a href="category.html" class="hover:text-white transition"><i class="fas fa-chevron-right mr-2 text-xs"></i>Danh mục</a></li>
-            <li><a href="#map-section" class="hover:text-white transition"><i class="fas fa-chevron-right mr-2 text-xs"></i>Bản đồ</a></li>
-            <li><a href="https://github.com/NgKhoa2308/utt-student-guide" target="_blank" class="hover:text-white transition"><i class="fab fa-github mr-2"></i>GitHub</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="font-bold mb-4">Liên hệ</h4>
-          <ul class="space-y-2 text-sm text-gray-400">
-            <li><i class="fas fa-university mr-2"></i>ĐH Giao thông Vận tải</li>
-            <li><i class="fas fa-map-marker-alt mr-2"></i>54 Triều Khúc, Thanh Xuân</li>
-            <li><i class="fas fa-envelope mr-2"></i>uttguide@example.com</li>
-          </ul>
-        </div>
-      </div>
-      <div class="border-t border-gray-800 pt-6 text-center text-sm text-gray-500">
-        <p>&copy; 2025 Nhóm UTT Student Guide. Made with <i class="fas fa-heart text-red-500"></i> by sinh viên UTT.</p>
-      </div>
-    </div>
-  </footer>
-  
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/app.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

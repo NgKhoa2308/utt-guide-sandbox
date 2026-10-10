@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yêu thích - UTT Student Guide</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: 'class' };</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<style>
+  * { font-family: 'Segoe UI', system-ui, sans-serif; }
+  .gradient-header { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 60%, #60a5fa 100%); }
+  .card-hover { transition: transform .3s, box-shadow .3s; }
+  .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,.15); }
+  .line-clamp-1 { display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+  .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+</style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors">
+
+<header class="gradient-header text-white sticky top-0 z-50 shadow-lg">
+  <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-3">
+      <div class="bg-white/20 backdrop-blur rounded-xl p-2.5"><i class="fas fa-map-marked-alt text-2xl"></i></div>
+      <div>
+        <h1 class="text-lg md:text-xl font-bold leading-tight">UTT Student Guide</h1>
+        <p class="text-xs text-blue-100">Cẩm nang số sinh viên UTT</p>
+      </div>
+    </a>
+    <nav class="hidden md:flex items-center gap-5 text-sm font-medium">
+      <a href="index.html" class="hover:text-yellow-300 transition"><i class="fas fa-home mr-1"></i>Trang chủ</a>
+      <a href="category.html" class="hover:text-yellow-300 transition"><i class="fas fa-th-large mr-1"></i>Danh mục</a>
+      <button id="darkModeBtn" class="text-xl hover:scale-110 transition">🌙</button>
+    </nav>
+  </div>
+</header>
+
+<main class="container mx-auto px-4 py-8">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold mb-2"><i class="fas fa-heart text-red-500 mr-2"></i>Địa điểm yêu thích</h1>
+    <p id="favCount" class="text-gray-500 dark:text-gray-400">Đang tải...</p>
+  </div>
+  <div id="favoritesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  <div id="emptyFavorites" class="hidden text-center py-20">
+    <i class="fas fa-heart-broken text-6xl text-gray-300 mb-4"></i>
+    <p class="text-gray-500 dark:text-gray-400 text-lg mb-4">Chưa có địa điểm yêu thích</p>
+    <a href="category.html" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">Khám phá địa điểm</a>
+  </div>
+  <section id="compareSection" class="mt-12 hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6">
+      <h2 class="text-2xl font-bold mb-4"><i class="fas fa-balance-scale text-purple-600 mr-2"></i>So sánh địa điểm</h2>
+      <div id="compareTable"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="bg-gray-900 dark:bg-black text-white py-5 px-4 mt-8 text-center">
+  <p class="text-xs text-gray-400">&copy; 2025 Nhóm UTT Student Guide</p>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script src="js/favorites.js"></script>
+</body>
+</html>

@@ -108,7 +108,10 @@ function clearCompare() {
   showToast('Đã xóa danh sách so sánh');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded',async  () => {
+  await initPlacesFromAPI();
+  await syncFavoritesFromSupabase();
+
   DarkMode.init();
   Favorites.updateBadge();
 

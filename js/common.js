@@ -1,18 +1,44 @@
 const Favorites = {
   KEY: 'utt_fav',
-  getAll() { try { return JSON.parse(localStorage.getItem(this.KEY)) || []; } catch { return []; } },
-  has(id) { return this.getAll().includes(id); },
+  
+  getAll() { 
+    try { 
+      const ids = JSON.parse(localStorage.getItem(this.KEY)) || [];
+      
+      // Lọc bỏ id không tồn tại trong PLACES hiện tại
+      if (typeof PLACES !== 'undefined' && PLACES.length > 0) {
+        const validIds = ids.filter(id => PLACES.some(p => p.id === id));
+        if (validIds.length !== ids.length) {
+          console.warn(`Favorites: đã xóa ${ids.length - validIds.length} id cũ`);
+          localStorage.setItem(this.KEY, JSON.stringify(validIds));
+        }
+        return validIds;
+      }
+      return ids;
+    } catch { 
+      return []; 
+    } 
+  },
+  
+  has(id) { 
+    return this.getAll().includes(id); 
+  },
+  
   toggle(id) {
-    const f = this.getAll(); const i = f.indexOf(id);
-    if (i > -1) f.splice(i, 1); else f.push(id);
+    const f = this.getAll(); 
+    const i = f.indexOf(id);
+    if (i > -1) f.splice(i, 1); 
+    else f.push(id);
     localStorage.setItem(this.KEY, JSON.stringify(f));
     this.updateBadge();
     return i === -1;
   },
+  
   updateBadge() {
     const n = this.getAll().length;
     document.querySelectorAll('.fav-badge').forEach(b => {
-      b.textContent = n; b.style.display = n > 0 ? 'flex' : 'none';
+      b.textContent = n; 
+      b.style.display = n > 0 ? 'flex' : 'none';
     });
   }
 };

@@ -11,7 +11,7 @@ const CATEGORIES = [
   { id: 'khac', name: 'Khác', icon: '🏪' }
 ];
 
-const PLACES = [
+let PLACES = [
   {
     id: 1,
     name: 'Quán Cơm Sinh Viên Triều Khúc',
@@ -22,7 +22,7 @@ const PLACES = [
     lat: 20.9815,
     lng: 105.8025,
     description: 'Quán cơm bình dân giá rẻ, phù hợp sinh viên. Cơm đầy đủ, canh miễn phí. Rất đông vào giờ trưa.',
-    image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&h=400&fit=crop',
+    image: 'https://batdongsantoanquoc24h.vn/wp-content/uploads/2025/03/z6391807482767_ac0aaf9c305b428fb513ebb037104d95.jpg',
     featured: true
   },
   {
@@ -74,7 +74,7 @@ const PLACES = [
     lat: 20.9800,
     lng: 105.8012,
     description: 'Cửa hàng tiện lợi mở 24/7. Có đồ ăn nhanh, nước uống, đồ dùng học tập.',
-    image: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=600&h=400&fit=crop',
+    image: 'https://saigonamthuc.vn/wp-content/uploads/2023/02/Nhung-tiem-Circle-K-gan-day-nhat-TPHCM2.jpg',
     featured: true
   },
   {

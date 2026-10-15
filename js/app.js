@@ -1,3 +1,19 @@
+// Chặn scroll lan ra ngoài dropdown
+document.addEventListener('DOMContentLoaded', () => {
+  const suggestions = document.getElementById('suggestions');
+  if (suggestions) {
+    suggestions.addEventListener('wheel', (e) => {
+      const atTop = suggestions.scrollTop === 0;
+      const atBottom = suggestions.scrollTop + suggestions.clientHeight >= suggestions.scrollHeight - 1;
+      
+      // Nếu đang ở đầu mà cuộn lên, hoặc ở cuối mà cuộn xuống → chặn
+      if ((atTop && e.deltaY < 0) || (atBottom && e.deltaY > 0)) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+  }
+});
+
 function renderCategories() {
   const grid = document.getElementById('categoriesGrid');
   if (!grid) return;
@@ -86,19 +102,29 @@ function handleSearch() {
 function showSuggestions(kw) {
   const box = document.getElementById('suggestions');
   if (!box) return;
-  if (!kw) return box.classList.add('hidden');
+  if (!kw || kw.length < 1) return box.classList.add('hidden');
+  
   const k = kw.toLowerCase();
-  const m = PLACES.filter(p => p.name.toLowerCase().includes(k) || p.description.toLowerCase().includes(k) || p.address.toLowerCase().includes(k)).slice(0, 5);
+  const m = PLACES.filter(p => 
+    p.name.toLowerCase().includes(k) || 
+    p.description.toLowerCase().includes(k) || 
+    p.address.toLowerCase().includes(k)
+  ).slice(0, 5);
+
   if (!m.length) return box.classList.add('hidden');
+
   box.innerHTML = m.map(p => {
     const c = CATEGORIES.find(x => x.id === p.category);
-    return `<a href="detail.html?id=${p.id}" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0">
-      <span class="text-xl">${c ? c.icon : '📍'}</span>
-      <div class="flex-1 min-w-0">
-        <div class="font-semibold text-sm truncate">${p.name}</div>
-        <div class="text-xs text-gray-400 truncate">${p.address}</div>
-      </div>
-    </a>`;
+    return `
+      <a href="detail.html?id=${p.id}" 
+         class="flex items-center gap-3 px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 transition">
+        <span class="text-2xl">${c ? c.icon : '📍'}</span>
+        <div class="flex-1 min-w-0">
+          <div class="suggestion-name truncate">${p.name}</div>
+          <div class="suggestion-address text-xs truncate">${p.address}</div>
+        </div>
+      </a>
+    `;
   }).join('');
   box.classList.remove('hidden');
 }
@@ -139,7 +165,10 @@ function animateCount(el, target) {
   }, 30); // 30ms/bước → ~1 giây
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  await initPlacesFromAPI();
+  await syncFavoritesFromSupabase();
+
   DarkMode.init();
   Favorites.updateBadge();
   renderCategories();

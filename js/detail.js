@@ -149,6 +149,10 @@ function renderDetail() {
         <div id="miniMap" style="height: 300px; border-radius: 8px;"></div>
       </div>
 
+        <div id="reviewsSection">
+        <p class="text-gray-500 text-sm p-6">Đang tải đánh giá...</p>
+      </div>
+
       <div class="p-6 flex flex-col md:flex-row gap-3">
         <a href="${gmap}" target="_blank" class="flex-1 bg-blue-600 text-white text-center py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
           🧭 Chỉ đường đến đây
@@ -164,6 +168,159 @@ function renderDetail() {
 
   renderRelated(place);
   initMiniMap(place);
+  renderReviews(id);  // ← THÊM
+}
+
+// ==========================================
+// RENDER REVIEWS
+// ==========================================
+async function renderReviews(placeId) {
+  const container = document.getElementById('reviewsSection');
+  if (!container) return;
+
+  container.innerHTML = '<p class="text-gray-500 text-sm">Đang tải đánh giá...</p>';
+
+  const reviews = await getReviewsFromSupabase(placeId);
+  const user = await getCurrentUser();
+  const avg = reviews.length > 0 
+    ? Math.round((reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) * 10) / 10 
+    : 0;
+
+  // Load profiles cho tất cả review authors
+  const reviewsWithNames = await Promise.all(reviews.map(async r => {
+    const profile = await getProfileById(r.user_id);
+    return { ...r, authorName: profile?.nickname || 'Ẩn danh' };
+  }));
+
+  const html = `
+    <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <h2 class="text-lg font-bold">
+          <i class="fas fa-star text-yellow-500 mr-2"></i>Đánh giá (${reviews.length})
+        </h2>
+        ${avg > 0 ? `
+          <div class="flex items-center gap-2">
+            <div class="text-3xl font-bold text-yellow-500">${avg}</div>
+            <div class="text-sm text-gray-500">/5</div>
+          </div>
+        ` : ''}
+      </div>
+
+      ${user ? `
+        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 mb-4">
+          <p class="text-sm font-semibold mb-2">Viết đánh giá của bạn:</p>
+          <div class="flex items-center gap-1 mb-3" id="newRatingStars">
+            ${[1,2,3,4,5].map(i => `
+              <button onclick="selectNewRating(${i})" data-star="${i}"
+                      class="star-btn text-3xl text-gray-300 hover:text-yellow-400 transition">★</button>
+            `).join('')}
+          </div>
+          <textarea id="newReviewContent" rows="2" 
+                    placeholder="Cảm nhận của bạn về địa điểm này..."
+                    class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm resize-none mb-2"></textarea>
+          <button onclick="submitReview(${placeId})" 
+                  class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition">
+            <i class="fas fa-paper-plane mr-1"></i>Gửi đánh giá
+          </button>
+        </div>
+      ` : `
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 mb-4 text-center">
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+            Đăng nhập để viết đánh giá
+          </p>
+          <a href="login.html" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">
+            Đăng nhập
+          </a>
+        </div>
+      `}
+
+      ${reviewsWithNames.length === 0 ? `
+        <p class="text-gray-500 text-sm text-center py-4">Chưa có đánh giá nào</p>
+      ` : `
+        <div class="space-y-3">
+          ${reviewsWithNames.map(r => `
+            <div class="border-b border-gray-100 dark:border-gray-700 pb-3 last:border-0">
+              <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                    ${r.authorName.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p class="font-semibold text-sm">${r.authorName}</p>
+                    <p class="text-xs text-gray-400">${new Date(r.created_at).toLocaleDateString('vi-VN')}</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-yellow-500 text-sm">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+                  ${user && user.id === r.user_id ? `
+                    <button onclick="removeReview(${r.id}, ${placeId})" 
+                            class="text-red-500 hover:text-red-700 text-sm">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+              ${r.content ? `<p class="text-sm text-gray-600 dark:text-gray-300 ml-10">${r.content}</p>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      `}
+    </div>
+  `;
+
+  container.innerHTML = html;
+
+  // Reset state
+  window._newRating = 0;
+}
+
+// Chọn sao mới
+function selectNewRating(rating) {
+  window._newRating = rating;
+  document.querySelectorAll('#newRatingStars .star-btn').forEach(btn => {
+    const star = parseInt(btn.dataset.star);
+    btn.classList.toggle('text-yellow-400', star <= rating);
+    btn.classList.toggle('text-gray-300', star > rating);
+  });
+}
+
+// Gửi review
+async function submitReview(placeId) {
+  const user = await getCurrentUser();
+  if (!user) {
+    showToast('Vui lòng đăng nhập', 'error');
+    return;
+  }
+
+  const rating = window._newRating || 0;
+  if (rating === 0) {
+    showToast('Chọn số sao trước', 'error');
+    return;
+  }
+
+  const content = document.getElementById('newReviewContent').value.trim();
+
+  showToast('Đang gửi...', 'info');
+  const result = await addReviewToSupabase(placeId, rating, content);
+
+  if (result) {
+    showToast('✅ Đã gửi đánh giá');
+    renderReviews(placeId);
+  } else {
+    showToast('❌ Không gửi được', 'error');
+  }
+}
+
+// Xóa review
+async function removeReview(reviewId, placeId) {
+  if (!confirm('Xóa đánh giá này?')) return;
+  const ok = await deleteReviewFromSupabase(reviewId);
+  if (ok) {
+    showToast('Đã xóa');
+    renderReviews(placeId);
+  } else {
+    showToast('Không xóa được', 'error');
+  }
 }
 
 function renderRelated(place) {
@@ -206,7 +363,9 @@ function initMiniMap(place) {
   L.marker([place.lat, place.lng]).addTo(map).bindPopup(`<strong>${place.name}</strong>`).openPopup();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded',async () => {
+  await initPlacesFromAPI();
+  await syncFavoritesFromSupabase();
   DarkMode.init();
   Favorites.updateBadge();
 

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản trị - UTT Student Guide</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    body { font-family: 'Segoe UI', system-ui, sans-serif; }
+    .gradient-header { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%); }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+  <!-- HEADER -->
+  <header class="gradient-header text-white sticky top-0 z-50 shadow-lg">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="bg-white/20 backdrop-blur rounded-lg p-2">
+          <i class="fas fa-map-marked-alt text-2xl"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold leading-tight">UTT Student Guide</h1>
+          <p class="text-xs text-blue-100">Trang Quản Trị</p>
+        </div>
+      </a>
+      <a href="index.html" class="text-sm hover:text-yellow-300 transition">
+        <i class="fas fa-home mr-1"></i>Trang chủ
+      </a>
+    </div>
+  </header>
+
+  <!-- KHÔNG PHẢI ADMIN -->
+  <div id="notAdmin" class="hidden container mx-auto px-4 py-20 text-center max-w-lg">
+    <i class="fas fa-lock text-6xl text-red-400 mb-4"></i>
+    <h2 class="text-2xl font-bold text-gray-800 mb-2">Không có quyền truy cập</h2>
+    <p class="text-gray-500 mb-6">Chỉ Admin mới vào được trang này.</p>
+    <a href="index.html" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700">
+      <i class="fas fa-arrow-left mr-2"></i>Về trang chủ
+    </a>
+  </div>
+
+  <!-- NỘI DUNG ADMIN -->
+  <div id="adminContent" class="hidden container mx-auto px-4 py-8 max-w-6xl">
+
+    <div class="mb-6">
+      <h2 class="text-2xl md:text-3xl font-bold text-gray-800">
+        <i class="fas fa-shield-alt text-blue-600 mr-2"></i>Bảng Quản Trị
+      </h2>
+      <p class="text-gray-500 text-sm mt-1">Duyệt và quản lý địa điểm do sinh viên đóng góp</p>
+    </div>
+
+    <!-- THỐNG KÊ -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-xl shadow p-4 text-center">
+        <div class="text-2xl font-bold text-gray-800" id="statTotal">0</div>
+        <div class="text-xs text-gray-500 mt-1">Tổng địa điểm</div>
+      </div>
+      <div class="bg-yellow-50 rounded-xl shadow p-4 text-center border border-yellow-200">
+        <div class="text-2xl font-bold text-yellow-600" id="statPending">0</div>
+        <div class="text-xs text-yellow-700 mt-1">Chờ duyệt</div>
+      </div>
+      <div class="bg-green-50 rounded-xl shadow p-4 text-center border border-green-200">
+        <div class="text-2xl font-bold text-green-600" id="statApproved">0</div>
+        <div class="text-xs text-green-700 mt-1">Đã duyệt</div>
+      </div>
+      <div class="bg-red-50 rounded-xl shadow p-4 text-center border border-red-200">
+        <div class="text-2xl font-bold text-red-600" id="statRejected">0</div>
+        <div class="text-xs text-red-700 mt-1">Đã từ chối</div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="flex gap-2 mb-4 overflow-x-auto">
+      <button onclick="switchAdminTab('pending')" data-tab="pending"
+              class="admin-tab px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-blue-600 text-white">
+        <i class="fas fa-clock mr-1"></i>Chờ duyệt
+      </button>
+      <button onclick="switchAdminTab('approved')" data-tab="approved"
+              class="admin-tab px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-gray-200 text-gray-700">
+        <i class="fas fa-check mr-1"></i>Đã duyệt
+      </button>
+      <button onclick="switchAdminTab('rejected')" data-tab="rejected"
+              class="admin-tab px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-gray-200 text-gray-700">
+        <i class="fas fa-times mr-1"></i>Đã từ chối
+      </button>
+      <button onclick="switchAdminTab('all')" data-tab="all"
+              class="admin-tab px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-gray-200 text-gray-700">
+        <i class="fas fa-list mr-1"></i>Tất cả
+      </button>
+    </div>
+
+    <!-- DANH SÁCH -->
+    <div id="adminList" class="space-y-3"></div>
+
+    <!-- EMPTY STATE -->
+    <div id="emptyState" class="hidden text-center py-16">
+      <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+      <p class="text-gray-500">Không có địa điểm nào trong mục này</p>
+    </div>
+
+  </div>
+
+  <footer class="bg-gray-900 text-white py-6 px-4 mt-12 text-center">
+    <p class="text-sm text-gray-400">&copy; 2025 Nhóm UTT Student Guide - Admin Panel</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

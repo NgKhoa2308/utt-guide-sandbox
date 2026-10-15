@@ -24,6 +24,38 @@
   html.dark .leaflet-tile { filter: brightness(.85); }
   .fab-btn { box-shadow: 0 8px 24px rgba(0,0,0,.15); transition: all .3s; }
   .fab-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,.2); }
+/* Fix màu chữ dropdown gợi ý */
+#suggestions a {
+  color: #1f2937 !important;
+}
+#suggestions .suggestion-name {
+  color: #1f2937 !important;
+  font-weight: 600;
+}
+#suggestions .suggestion-address {
+  color: #6b7280 !important;
+}
+#suggestions a:hover {
+  background: #f3f4f6;
+}
+
+/* Dark mode cho dropdown */
+.dark #suggestions a,
+.dark #suggestions .suggestion-name {
+  color: #f3f4f6 !important;
+}
+.dark #suggestions .suggestion-address {
+  color: #9ca3af !important;
+}
+.dark #suggestions a:hover {
+  background: #374151;
+}
+
+/* Scroll mượt cho dropdown */
+#suggestions {
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
 </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors">
@@ -42,8 +74,14 @@
       <a href="category.html" class="hover:text-yellow-300 transition"><i class="fas fa-th-large mr-1"></i>Danh mục</a>
       <a href="#map-section" class="hover:text-yellow-300 transition"><i class="fas fa-map mr-1"></i>Bản đồ</a>
       <a href="favorites.html" class="hover:text-yellow-300 transition relative">
-        <i class="fas fa-heart mr-1"></i>Yêu thích
-        <span class="fav-badge absolute -top-2 -right-3 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full items-center justify-center font-bold" style="display:none;"></span>
+      <i class="fas fa-heart mr-1"></i>Yêu thích
+      <span class="fav-badge absolute -top-2 -right-3 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full items-center justify-center font-bold" style="display:none;"></span>
+      <a href="submit.html" class="hover:text-yellow-300 transition">
+      <i class="fas fa-plus-circle mr-1"></i>Đóng góp
+      </a>
+      <a href="login.html" id="authLink" class="hover:text-yellow-300 transition">
+      <i class="fas fa-sign-in-alt mr-1"></i><span id="authText">Đăng nhập</span>
+      </a>
       </a>
       <a href="profile.html" class="hover:text-yellow-300 transition"><i class="fas fa-user mr-1"></i>Cá nhân</a>
       <button id="darkModeBtn" class="text-xl hover:scale-110 transition">🌙</button>
@@ -58,20 +96,23 @@
   </div>
 </header>
 
-<section class="hero-bg text-white py-16 px-4 relative overflow-hidden">
+<section class="hero-bg text-white py-16 px-4 relative">
   <div class="absolute -top-10 -left-10 text-[10rem] opacity-10"><i class="fas fa-map-pin"></i></div>
   <div class="absolute -bottom-10 -right-10 text-[10rem] opacity-10"><i class="fas fa-compass"></i></div>
-  <div class="container mx-auto text-center relative z-10">
+  <div class="container mx-auto text-center relative z-30">
     <h1 class="text-3xl md:text-5xl font-bold mb-3 fade-in">Tìm nhanh địa điểm quanh UTT</h1>
     <p class="text-blue-100 mb-8 text-base md:text-lg fade-in">Ăn uống, photocopy, sửa xe, nhà thuốc, học nhóm... tất cả trong một</p>
     <div class="max-w-2xl mx-auto relative fade-in">
-      <div class="flex bg-white rounded-2xl overflow-hidden shadow-2xl">
+      <div class="flex bg-white rounded-2xl shadow-2xl">
         <div class="flex items-center pl-5 text-gray-400"><i class="fas fa-search"></i></div>
         <input type="text" id="searchInput" placeholder="VD: photocopy, cơm 30k, nhà thuốc..." autocomplete="off"
                class="flex-1 px-4 py-4 text-gray-800 outline-none">
         <button id="searchBtn" class="bg-yellow-400 text-blue-900 px-6 md:px-8 font-bold hover:bg-yellow-300 transition">Tìm</button>
       </div>
-      <div id="suggestions" class="hidden absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-2xl overflow-hidden z-30 text-left"></div>
+      <div id="suggestions" 
+     style="overscroll-behavior: contain;"
+     class="hidden absolute left-0 right-0 mt-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-y-auto z-50 max-h-80">
+</div>
       <div class="flex flex-wrap gap-2 mt-4 justify-center text-sm">
         <span class="text-blue-200 py-1">Gợi ý:</span>
         <button class="quick-search bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-1 rounded-full transition" data-keyword="photocopy"><i class="fas fa-print mr-1"></i>photocopy</button>
@@ -95,7 +136,6 @@
     </div>
   </div>
 </section>
-
 <section class="container mx-auto px-4 -mt-8 relative z-20">
   <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 grid grid-cols-3 gap-4 text-center">
     <div>
@@ -186,6 +226,10 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/api.js"></script>
+<script src="js/header-auth.js"></script>
 <script src="js/data.js"></script>
 <script src="js/common.js"></script>
 <script src="js/app.js"></script>

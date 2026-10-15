@@ -101,15 +101,38 @@ function setRating(id, s) {
   if (typeof renderDetail === 'function') renderDetail();
 }
 
-function toggleFavorite(id, e) {
+async function toggleFavorite(id, e) {
   if (e) e.stopPropagation();
+  
+  // Bước 1: Cập nhật localStorage ngay (UI phản hồi tức thì)
   const isFav = Favorites.toggle(id);
-  showToast(isFav ? '❤️ Đã thêm yêu thích' : 'Đã xóa yêu thích');
+  
+  // Bước 2: Cập nhật icon
   document.querySelectorAll(`[data-fav-id="${id}"]`).forEach(el => {
     el.innerHTML = isFav ? '❤️' : '🤍';
     el.classList.add('scale-125');
     setTimeout(() => el.classList.remove('scale-125'), 300);
   });
+  
+  // Bước 3: Nếu đã đăng nhập → sync lên Supabase
+  const user = await getCurrentUser();
+  if (user) {
+    try {
+      if (isFav) {
+        await addFavoriteToSupabase(id);
+        showToast('❤️ Đã thêm yêu thích (đã sync)');
+      } else {
+        await removeFavoriteFromSupabase(id);
+        showToast('Đã xóa yêu thích');
+      }
+    } catch (error) {
+      console.error('Lỗi sync favorite:', error);
+      showToast('⚠️ Không sync được, nhưng đã lưu máy', 'error');
+    }
+  } else {
+    // Chưa login → chỉ dùng localStorage
+    showToast(isFav ? '❤️ Đã thêm yêu thích (chưa đăng nhập)' : 'Đã xóa yêu thích');
+  }
 }
 
 function toggleCompare(id, e) {

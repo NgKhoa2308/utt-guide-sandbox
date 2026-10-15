@@ -39,10 +39,32 @@ function renderFavorites() {
   }).join('');
 }
 
-function toggleFavoriteAndReload(id, e) {
+async function toggleFavoriteAndReload(id, e) {
   if (e) e.stopPropagation();
-  Favorites.toggle(id);
-  showToast('Đã cập nhật yêu thích');
+  
+  // Bước 1: Cập nhật localStorage + UI
+  const isFav = Favorites.toggle(id);
+  
+  // Bước 2: Nếu đã đăng nhập → sync Supabase
+  const user = await getCurrentUser();
+  if (user) {
+    try {
+      if (isFav) {
+        await addFavoriteToSupabase(id);
+        showToast('❤️ Đã thêm yêu thích');
+      } else {
+        await removeFavoriteFromSupabase(id);
+        showToast('Đã xóa yêu thích');
+      }
+    } catch (error) {
+      console.error('Lỗi sync:', error);
+      showToast('⚠️ Không sync được', 'error');
+    }
+  } else {
+    showToast(isFav ? '❤️ Đã thêm' : 'Đã xóa');
+  }
+  
+  // Bước 3: Reload UI
   setTimeout(() => { renderFavorites(); renderCompare(); }, 300);
 }
 

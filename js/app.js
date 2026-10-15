@@ -111,6 +111,34 @@ function initDarkBtn() {
   b.onclick = () => { DarkMode.toggle(); u(); };
 }
 
+// ============ CẬP NHẬT SỐ LIỆU THỐNG KÊ ============
+function updateStats() {
+  const statPlaces = document.getElementById('statPlaces');
+  const statCategories = document.getElementById('statCategories');
+  
+  if (statPlaces) statPlaces.textContent = PLACES.length;
+  if (statCategories) statCategories.textContent = CATEGORIES.length;
+  
+  // Bonus: hiệu ứng đếm số từ 0 lên
+  animateCount(statPlaces, PLACES.length);
+  animateCount(statCategories, CATEGORIES.length);
+}
+
+// Hiệu ứng đếm số
+function animateCount(el, target) {
+  if (!el) return;
+  let current = 0;
+  const step = Math.max(1, Math.floor(target / 30)); // 30 bước
+  const timer = setInterval(() => {
+    current += step;
+    if (current >= target) {
+      current = target;
+      clearInterval(timer);
+    }
+    el.textContent = current;
+  }, 30); // 30ms/bước → ~1 giây
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   DarkMode.init();
   Favorites.updateBadge();
@@ -118,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderFeatured();
   renderHistory();
   initMap();
+  updateStats();
   initDarkBtn();
 
   const si = document.getElementById('searchInput');

@@ -19,9 +19,6 @@ function renderDetail() {
     return;
   }
 
-  History.add(id);
-  Views.inc(id);
-
   const cat = CATEGORIES.find(c => c.id === place.category);
   const gmap = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`;
   const isFav = Favorites.has(id);
@@ -218,6 +215,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const u = () => b.innerHTML = DarkMode.isOn() ? '☀️' : '🌙';
     u();
     b.onclick = () => { DarkMode.toggle(); u(); };
+  }
+
+  // Chỉ tăng view + lịch sử 1 lần khi vào trang
+  const id = getPlaceId();
+  const place = PLACES.find(p => p.id === id);
+  if (place) {
+    History.add(id);
+    Views.inc(id);
   }
 
   renderDetail();

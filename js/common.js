@@ -144,6 +144,35 @@ function clearHistory() {
   document.getElementById('historySection')?.classList.add('hidden');
 }
 
+// ===== LẤY ẢNH ĐỊA ĐIỂM =====
+function getPlaceImage(place) {
+  // Hỗ trợ cả id và object
+  if (typeof place === 'number') {
+    place = PLACES.find(p => p.id === place);
+    if (!place) return getFallbackImage('khac');
+  }
+
+  // Nếu địa điểm có ảnh riêng → dùng
+  if (place.image && place.image.trim()) return place.image;
+
+  // Fallback theo danh mục
+  return getFallbackImage(place.category);
+}
+
+function getFallbackImage(category) {
+  const fallbacks = {
+    'an-uong':  'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&h=400&fit=crop',
+    'in-an':    'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=600&h=400&fit=crop',
+    'sua-chua': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
+    'nha-thuoc':'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=600&h=400&fit=crop',
+    'cua-hang': 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=600&h=400&fit=crop',
+    'hoc-tap':  'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&h=400&fit=crop',
+    'khac':     'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&h=400&fit=crop'
+  };
+  return fallbacks[category] || fallbacks['khac'];
+}
+
+
 function createPlaceCard(place) {
   const cat = CATEGORIES.find(c => c.id === place.category);
   const catColor = {

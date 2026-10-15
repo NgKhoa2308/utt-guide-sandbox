@@ -88,12 +88,20 @@
     </nav>
     <button id="menuBtn" class="md:hidden text-2xl"><i class="fas fa-bars"></i></button>
   </div>
-  <div id="mobileMenu" class="hidden md:hidden bg-blue-800 px-4 py-3 space-y-2 text-sm">
-    <a href="index.html" class="block py-1"><i class="fas fa-home mr-2"></i>Trang chủ</a>
-    <a href="category.html" class="block py-1"><i class="fas fa-th-large mr-2"></i>Danh mục</a>
-    <a href="favorites.html" class="block py-1"><i class="fas fa-heart mr-2"></i>Yêu thích</a>
-    <a href="profile.html" class="block py-1"><i class="fas fa-user mr-2"></i>Cá nhân</a>
-  </div>
+<div id="mobileMenu" class="hidden md:hidden bg-blue-800 px-4 py-3 space-y-2 text-sm">
+  <a href="index.html" class="block py-1"><i class="fas fa-home mr-2"></i>Trang chủ</a>
+  <a href="category.html" class="block py-1"><i class="fas fa-th-large mr-2"></i>Danh mục</a>
+  <a href="index.html#map-section" class="block py-1"><i class="fas fa-map mr-2"></i>Bản đồ</a>
+  <a href="favorites.html" class="block py-1"><i class="fas fa-heart mr-2"></i>Yêu thích</a>
+  <a href="submit.html" class="block py-1"><i class="fas fa-plus-circle mr-2"></i>Đóng góp</a>
+  <a href="login.html" id="authLinkMobile" class="block py-1">
+    <i class="fas fa-sign-in-alt mr-2"></i><span id="authTextMobile">Đăng nhập</span>
+  </a>
+  <a href="profile.html" class="block py-1"><i class="fas fa-user mr-2"></i>Cá nhân</a>
+  <button id="darkModeBtnMobile" class="block py-1 text-left w-full">
+    <i class="fas fa-moon mr-2"></i><span id="darkTextMobile">Dark mode</span>
+  </button>
+</div>
 </header>
 
 <section class="hero-bg text-white py-16 px-4 relative">

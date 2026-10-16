@@ -21,7 +21,7 @@ function renderCategories() {
     'an-uong': 'from-orange-400 to-red-400', 'in-an': 'from-blue-400 to-cyan-400',
     'sua-chua': 'from-gray-400 to-gray-600', 'nha-thuoc': 'from-red-400 to-pink-500',
     'cua-hang': 'from-green-400 to-emerald-500', 'hoc-tap': 'from-purple-400 to-indigo-500',
-    'khac': 'from-yellow-400 to-amber-500'
+    'nha-tro': 'from-rose-400 to-orange-400','khac': 'from-yellow-400 to-amber-500'
   };
   grid.innerHTML = CATEGORIES.map(c => {
     const n = PLACES.filter(p => p.category === c.id).length;

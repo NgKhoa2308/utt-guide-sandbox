@@ -31,7 +31,12 @@ async function loadPlacesFromSupabase() {
       lng: parseFloat(p.lng),
       description: p.description || '',
       image: p.photo_url || '',
-      featured: p.featured || false
+      featured: p.featured || false,
+      roomType: p.room_type || '',       
+      area: p.area || '',                  
+      amenities: p.amenities || '',       
+      deposit: p.deposit || '',      
+      contact: p.contact || ''
     }));
 
   } catch (error) {

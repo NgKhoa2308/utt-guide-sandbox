@@ -228,7 +228,7 @@ function createPlaceCard(place) {
     'an-uong': 'bg-orange-100 text-orange-700', 'in-an': 'bg-blue-100 text-blue-700',
     'sua-chua': 'bg-gray-100 text-gray-700', 'nha-thuoc': 'bg-red-100 text-red-700',
     'cua-hang': 'bg-green-100 text-green-700', 'hoc-tap': 'bg-purple-100 text-purple-700',
-    'khac': 'bg-yellow-100 text-yellow-700'
+    'nha-tro': 'bg-rose-100 text-rose-700','khac': 'bg-yellow-100 text-yellow-700'
   }[place.category] || 'bg-gray-100 text-gray-700';
   const isFav = Favorites.has(place.id);
   const isVisited = Visited.has(place.id);

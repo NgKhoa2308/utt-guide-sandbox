@@ -23,6 +23,10 @@ Tìm → Lọc → Xem → Định vị → Chỉ đường
 
 Sẽ cập nhật sau.
 
+## Backend
+
+Backend FastAPI được đặt trong thư mục `backend/`. Xem `backend/README.md` để biết cách cài dependency, chạy migration, khởi động server và chạy test.
+
 ## 📅 Timeline
 
 2-3 tuầ

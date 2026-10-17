@@ -33,16 +33,17 @@ function updateTitle() {
 function getFiltered() {
   let places = PLACES.filter(p => {
     if (state.category && p.category !== state.category) return false;
+    // Lọc theo giá
     if (state.priceFilter) {
-      const n = extractPriceNumber(p.price);
+      const n = extractPriceNumber(place.price);
       
       if (state.category === 'nha-tro') {
-        // Filter theo triệu (đơn vị VNĐ)
+        // Lọc nhà trọ (tính bằng VNĐ)
         if (state.priceFilter === 'duoi-2-trieu' && n > 2000000) return false;
         if (state.priceFilter === '2-3-trieu' && (n < 2000000 || n > 3000000)) return false;
         if (state.priceFilter === 'tren-3-trieu' && n < 3000000) return false;
       } else {
-        // Filter ăn uống theo nghìn
+        // Lọc quán ăn/dịch vụ (tính bằng nghìn)
         if (state.priceFilter === 'duoi-30' && n > 30000) return false;
         if (state.priceFilter === '30-50' && (n < 30000 || n > 50000)) return false;
         if (state.priceFilter === 'tren-50' && n < 50000) return false;
@@ -85,8 +86,10 @@ function renderCategoryFilter() {
   el.querySelectorAll('.filter-btn').forEach(b => {
     b.onclick = () => {
       state.category = b.dataset.cat || null;
+      state.priceFilter = null;
       updateTitle();
       renderCategoryFilter();
+      renderPriceFilter();
       renderPlaces();
     };
   });
@@ -96,7 +99,7 @@ function renderPriceFilter() {
   const el = document.getElementById('priceFilter');
   if (!el) return;
 
-  // Filter khác nhau cho từng danh mục
+  // Nếu là nhà trọ thì hiện mức giá theo TRIỆU, ngược lại hiện theo NGHÌN
   const options = state.category === 'nha-tro'
     ? [
         { id: null, label: 'Tất cả mức thuê', icon: '💰' },

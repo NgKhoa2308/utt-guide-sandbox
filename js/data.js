@@ -23,7 +23,7 @@ let PLACES = [
     lat: 20.9815,
     lng: 105.8025,
     description: 'Quán cơm bình dân giá rẻ, phù hợp sinh viên. Cơm đầy đủ, canh miễn phí. Rất đông vào giờ trưa.',
-    image: 'https://batdongsantoanquoc24h.vn/wp-content/uploads/2025/03/z6391807482767_ac0aaf9c305b428fb513ebb037104d95.jpg',
+    image: 'https://batdongsantoanquoc24h.vn/wp-content/uploads/2026/03/z6391807482767_ac0aaf9c305b428fb513ebb037104d95.jpg',
     featured: true
   },
   {
@@ -296,7 +296,7 @@ let PLACES = [
     lat: 20.9819216,
     lng: 105.7978557,
     description: 'Quán có không gian rộng rãi, cấu hình máy mạnh mẽ, nhân viên nhiệt tình.',
-    image: 'https://scontent.fhan3-5.fna.fbcdn.net/v/t39.30808-6/574903301_704832025987182_7808109345550161806_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx2048x2048&ctp=p526x296&_nc_cat=105&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=stER1iSq8L0Q7kNvwGRbaGw&_nc_oc=AdrCc_xKIOj0R5YqqBnFFRCth2uUCyqe-B_zgVG4uKfLB3JnLOfCvOYq5svdCzMG6us&_nc_zt=23&_nc_ht=scontent.fhan3-5.fna&_nc_gid=4Z3BkL1TG8OYtS4MWKqG0Q&_nc_ss=7b2a8&oh=00_AQNeX4WEvgBGdmmcNJch8nKRQznYdNAB-YKBd3yTlYBKuw&oe=6AD6399F',
+    image: 'https://scontent.fhan3-5.fna.fbcdn.net/v/t39.30808-6/574903301_704832026987182_7808109345550161806_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx2048x2048&ctp=p526x296&_nc_cat=105&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=stER1iSq8L0Q7kNvwGRbaGw&_nc_oc=AdrCc_xKIOj0R5YqqBnFFRCth2uUCyqe-B_zgVG4uKfLB3JnLOfCvOYq5svdCzMG6us&_nc_zt=23&_nc_ht=scontent.fhan3-5.fna&_nc_gid=4Z3BkL1TG8OYtS4MWKqG0Q&_nc_ss=7b2a8&oh=00_AQNeX4WEvgBGdmmcNJch8nKRQznYdNAB-YKBd3yTlYBKuw&oe=6AD6399F',
     featured: false
   },
   {

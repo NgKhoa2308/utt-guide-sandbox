@@ -191,3 +191,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   const mm = document.getElementById('mobileMenu');
   if (mb && mm) mb.onclick = () => mm.classList.toggle('hidden');
 });
+
+// Bắt sự kiện khi người dùng bấm nút Back của trình duyệt quay về trang chủ
+window.addEventListener('pageshow', (event) => {
+  // event.persisted = true nghĩa là trang được load từ bộ nhớ đệm (BFCache)
+  if (event.persisted) {
+    console.log("Trang được load từ cache, đang tải lại dữ liệu...");
+    
+    // Gọi lại API để lấy số view mới nhất
+    if (typeof initPlacesFromAPI === 'function') {
+      initPlacesFromAPI().then(() => {
+        renderCategories();
+        renderFeatured();
+        renderHistory();
+        updateStats();
+        initMap(); // Nếu muốn map cũng cập nhật lại
+      });
+    }
+  }
+});

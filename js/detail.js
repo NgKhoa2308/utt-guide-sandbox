@@ -25,7 +25,7 @@ function renderDetail() {
   const isVisited = Visited.has(id);
   const isWish = Wishlist.has(id);
   const r = Ratings.get(id);
-  const v = Views.get(id);
+  const v = place.view_count || 0;
   const d = getDistance(UTT_LOCATION[0], UTT_LOCATION[1], place.lat, place.lng);
   const dText = d < 1000 ? `${d}m` : `${(d/1000).toFixed(1)}km`;
   const img = getPlaceImage(place);
@@ -378,9 +378,10 @@ function initMiniMap(place) {
   L.marker([place.lat, place.lng]).addTo(map).bindPopup(`<strong>${place.name}</strong>`).openPopup();
 }
 
-document.addEventListener('DOMContentLoaded',async () => {
+document.addEventListener('DOMContentLoaded', async () => {
   await initPlacesFromAPI();
   await syncFavoritesFromSupabase();
+
   DarkMode.init();
   Favorites.updateBadge();
 
@@ -394,10 +395,23 @@ document.addEventListener('DOMContentLoaded',async () => {
   // Chỉ tăng view + lịch sử 1 lần khi vào trang
   const id = getPlaceId();
   const place = PLACES.find(p => p.id === id);
+  
   if (place) {
     History.add(id);
-    Views.inc(id);
+    
+    // Tăng view trên Supabase
+    if (typeof incrementViewOnSupabase === 'function') {
+      try {
+        await incrementViewOnSupabase(id);
+        // Cộng 1 vào biến tạm để giao diện hiển thị ngay lập tức
+        place.view_count = (place.view_count || 0) + 1;
+        console.log("✅ Đã gọi API tăng view thành công!");
+      } catch (e) {
+        console.error("❌ Lỗi gọi API tăng view:", e);
+      }
+    }
   }
 
+  // Vẽ giao diện SAU KHI đã cộng số view
   renderDetail();
 });

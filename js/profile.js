@@ -102,7 +102,13 @@ function resetAll() {
   setTimeout(() => location.reload(), 800);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded',async  () => {
+  if (typeof initPlacesFromAPI === 'function') {
+    await initPlacesFromAPI();
+  }
+  if (typeof syncFavoritesFromSupabase === 'function') {
+    await syncFavoritesFromSupabase();
+  }
   DarkMode.init();
   Favorites.updateBadge();
 

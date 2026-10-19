@@ -25,7 +25,7 @@ function renderDetail() {
   const isVisited = Visited.has(id);
   const isWish = Wishlist.has(id);
   const r = Ratings.get(id);
-  const v = Views.get(id);
+  const v = place.view_count || 0;
   const d = getDistance(UTT_LOCATION[0], UTT_LOCATION[1], place.lat, place.lng);
   const dText = d < 1000 ? `${d}m` : `${(d/1000).toFixed(1)}km`;
   const img = getPlaceImage(place);
@@ -122,6 +122,21 @@ function renderDetail() {
           <p class="text-sm text-gray-600 dark:text-gray-300">${place.lat}, ${place.lng}</p>
         </div>
       </div>
+
+      ${place.roomType ? `
+        <div class="p-6 border-b border-gray-100 dark:border-gray-700 bg-rose-50 dark:bg-rose-900/20">
+          <h2 class="text-lg font-bold mb-3 flex items-center gap-2">
+            <i class="fas fa-home text-rose-600"></i>Thông tin phòng
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            <p><span class="text-gray-500 dark:text-gray-400">Loại phòng:</span> <strong>${place.roomType}</strong></p>
+            <p><span class="text-gray-500 dark:text-gray-400">Diện tích:</span> <strong>${place.area || 'Đang cập nhật'}</strong></p>
+            <p class="md:col-span-2"><span class="text-gray-500 dark:text-gray-400">Tiện ích:</span> <strong>${place.amenities || 'Đang cập nhật'}</strong></p>
+            <p><span class="text-gray-500 dark:text-gray-400">Tiền cọc:</span> <strong>${place.deposit || 'Liên hệ'}</strong></p>
+            <p><span class="text-gray-500 dark:text-gray-400">Liên hệ:</span> <strong class="text-rose-600">${place.contact || 'Đang cập nhật'}</strong></p>
+          </div>
+        </div>
+      ` : ''}
 
       <div class="p-6 border-b border-gray-100 dark:border-gray-700">
         <h2 class="text-lg font-bold mb-2">Mô tả</h2>
@@ -363,9 +378,10 @@ function initMiniMap(place) {
   L.marker([place.lat, place.lng]).addTo(map).bindPopup(`<strong>${place.name}</strong>`).openPopup();
 }
 
-document.addEventListener('DOMContentLoaded',async () => {
+document.addEventListener('DOMContentLoaded', async () => {
   await initPlacesFromAPI();
   await syncFavoritesFromSupabase();
+
   DarkMode.init();
   Favorites.updateBadge();
 
@@ -379,10 +395,23 @@ document.addEventListener('DOMContentLoaded',async () => {
   // Chỉ tăng view + lịch sử 1 lần khi vào trang
   const id = getPlaceId();
   const place = PLACES.find(p => p.id === id);
+  
   if (place) {
     History.add(id);
-    Views.inc(id);
+    
+    // Tăng view trên Supabase
+    if (typeof incrementViewOnSupabase === 'function') {
+      try {
+        await incrementViewOnSupabase(id);
+        // Cộng 1 vào biến tạm để giao diện hiển thị ngay lập tức
+        place.view_count = (place.view_count || 0) + 1;
+        console.log("✅ Đã gọi API tăng view thành công!");
+      } catch (e) {
+        console.error("❌ Lỗi gọi API tăng view:", e);
+      }
+    }
   }
 
+  // Vẽ giao diện SAU KHI đã cộng số view
   renderDetail();
 });

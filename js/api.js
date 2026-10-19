@@ -31,7 +31,13 @@ async function loadPlacesFromSupabase() {
       lng: parseFloat(p.lng),
       description: p.description || '',
       image: p.photo_url || '',
-      featured: p.featured || false
+      featured: p.featured || false,
+      view_count: p.view_count || 0,
+      roomType: p.room_type || '',       
+      area: p.area || '',                  
+      amenities: p.amenities || '',       
+      deposit: p.deposit || '',      
+      contact: p.contact || ''
     }));
 
   } catch (error) {
@@ -373,5 +379,18 @@ async function deletePlaceAdmin(placeId) {
   } catch (error) {
     console.error('Lỗi xóa:', error);
     return false;
+  }
+}
+
+// Tăng lượt xem trên Supabase
+async function incrementViewOnSupabase(placeId) {
+  if (!sb) return;
+  try {
+    // Gọi hàm RPC vừa tạo
+    const { error } = await sb.rpc('increment_view_count', { location_id: placeId });
+    if (error) throw error;
+    console.log(`✅ Đã tăng view cho địa điểm ID: ${placeId}`);
+  } catch (error) {
+    console.error('Lỗi tăng view:', error);
   }
 }

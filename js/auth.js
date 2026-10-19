@@ -129,6 +129,29 @@ async function handleRegister(e) {
   }
 }
 
+// Xử lý quên mật khẩu
+document.getElementById('forgotPasswordLink')?.addEventListener('click', async (e) => {
+  e.preventDefault();
+  
+  const email = prompt('Nhập email bạn đã đăng ký để nhận link khôi phục mật khẩu:');
+  if (!email) return; // Nếu người dùng bấm Cancel
+
+  try {
+    // Gọi API của Supabase để gửi email khôi phục
+    const { data, error } = await sb.auth.resetPasswordForEmail(email, {
+      // Đường dẫn trang sẽ mở ra khi người dùng bấm vào link trong email
+      redirectTo: window.location.origin + window.location.pathname.replace('login.html', '') + 'reset-password.html'
+    });
+
+    if (error) throw error;
+
+    alert('✅ Đã gửi email khôi phục! Vui lòng kiểm tra hộp thư (cả mục Spam) của bạn.');
+  } catch (error) {
+    console.error('Lỗi khôi phục mật khẩu:', error);
+    alert('❌ Lỗi: ' + error.message);
+  }
+});
+
 // ==========================================
 // KHỞI TẠO
 // ==========================================

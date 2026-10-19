@@ -52,7 +52,23 @@ const Ratings = {
 
 const History = {
   KEY: 'utt_history', MAX: 10,
-  getAll() { try { return JSON.parse(localStorage.getItem(this.KEY)) || []; } catch { return []; } },
+  getAll() { 
+    try { 
+      const ids = JSON.parse(localStorage.getItem(this.KEY)) || [];
+      
+      // Lọc bỏ các ID không tồn tại trong danh sách địa điểm hiện tại
+      if (typeof PLACES !== 'undefined' && PLACES.length > 0) {
+        const validIds = ids.filter(id => PLACES.some(p => p.id === id));
+        if (validIds.length !== ids.length) {
+          localStorage.setItem(this.KEY, JSON.stringify(validIds));
+        }
+        return validIds;
+      }
+      return ids;
+    } catch { 
+      return []; 
+    } 
+  },
   add(id) {
     let h = this.getAll().filter(x => x !== id);
     h.unshift(id); if (h.length > this.MAX) h = h.slice(0, this.MAX);
@@ -99,8 +115,14 @@ function showToast(msg, type = 'success') {
   setTimeout(() => { t.classList.add('translate-y-4', 'opacity-0'); setTimeout(() => t.remove(), 300); }, 2200);
 }
 
-function extractPriceNumber(s) { const m = s.replace(/\./g, '').match(/\d+/); return m ? parseInt(m[0]) : 0; }
-
+function extractPriceNumber(priceStr) {
+  if (!priceStr) return 0;
+  // Tìm cụm số đầu tiên trong chuỗi (VD: "20.000" trong "20.000 - 30.000đ")
+  const match = String(priceStr).match(/\d+(?:[.,]\d+)*/);
+  if (!match) return 0;
+  // Bỏ dấu chấm/phẩy và chuyển thành số nguyên
+  return parseInt(match[0].replace(/[.,]/g, ''));
+}
 function getDistance(lat1, lng1, lat2, lng2) {
   const R = 6371000;
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -228,7 +250,7 @@ function createPlaceCard(place) {
     'an-uong': 'bg-orange-100 text-orange-700', 'in-an': 'bg-blue-100 text-blue-700',
     'sua-chua': 'bg-gray-100 text-gray-700', 'nha-thuoc': 'bg-red-100 text-red-700',
     'cua-hang': 'bg-green-100 text-green-700', 'hoc-tap': 'bg-purple-100 text-purple-700',
-    'khac': 'bg-yellow-100 text-yellow-700'
+    'nha-tro': 'bg-rose-100 text-rose-700','khac': 'bg-yellow-100 text-yellow-700'
   }[place.category] || 'bg-gray-100 text-gray-700';
   const isFav = Favorites.has(place.id);
   const isVisited = Visited.has(place.id);

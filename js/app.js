@@ -21,7 +21,7 @@ function renderCategories() {
     'an-uong': 'from-orange-400 to-red-400', 'in-an': 'from-blue-400 to-cyan-400',
     'sua-chua': 'from-gray-400 to-gray-600', 'nha-thuoc': 'from-red-400 to-pink-500',
     'cua-hang': 'from-green-400 to-emerald-500', 'hoc-tap': 'from-purple-400 to-indigo-500',
-    'khac': 'from-yellow-400 to-amber-500'
+    'nha-tro': 'from-rose-400 to-orange-400','khac': 'from-yellow-400 to-amber-500'
   };
   grid.innerHTML = CATEGORIES.map(c => {
     const n = PLACES.filter(p => p.category === c.id).length;
@@ -58,10 +58,7 @@ function initMap() {
   if (!el) return;
   const map = L.map('map').setView(UTT_LOCATION, 15);
   const street = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri', maxZoom: 19 });
-  const sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri', maxZoom: 19 });
   street.addTo(map);
-  L.control.layers({ '🗺️ Đường phố': street, '🛰️ Vệ tinh': sat }, null, { position: 'topright' }).addTo(map);
-
   const markers = L.markerClusterGroup({
     showCoverageOnHover: false, maxClusterRadius: 50, spiderfyOnMaxZoom: true,
     iconCreateFunction: c => L.divIcon({
@@ -193,4 +190,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   const mb = document.getElementById('menuBtn');
   const mm = document.getElementById('mobileMenu');
   if (mb && mm) mb.onclick = () => mm.classList.toggle('hidden');
+});
+
+// Bắt sự kiện khi người dùng bấm nút Back của trình duyệt quay về trang chủ
+window.addEventListener('pageshow', (event) => {
+  // event.persisted = true nghĩa là trang được load từ bộ nhớ đệm (BFCache)
+  if (event.persisted) {
+    console.log("Trang được load từ cache, đang tải lại dữ liệu...");
+    
+    // Gọi lại API để lấy số view mới nhất
+    if (typeof initPlacesFromAPI === 'function') {
+      initPlacesFromAPI().then(() => {
+        renderCategories();
+        renderFeatured();
+        renderHistory();
+        updateStats();
+        initMap(); // Nếu muốn map cũng cập nhật lại
+      });
+    }
+  }
 });

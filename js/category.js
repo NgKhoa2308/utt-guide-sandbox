@@ -32,19 +32,35 @@ function updateTitle() {
 
 function getFiltered() {
   let places = PLACES.filter(p => {
+    // 1. Lọc theo danh mục
     if (state.category && p.category !== state.category) return false;
+
+    // 2. Lọc theo giá
     if (state.priceFilter) {
       const n = extractPriceNumber(p.price);
-      if (state.priceFilter === 'duoi-30' && n > 30000) return false;
-      if (state.priceFilter === '30-50' && (n < 30000 || n > 50000)) return false;
-      if (state.priceFilter === 'tren-50' && n < 50000) return false;
+      
+      if (state.category === 'nha-tro') {
+        // Lọc nhà trọ (tính bằng triệu)
+        if (state.priceFilter === 'duoi-2-trieu' && n > 2000000) return false;
+        if (state.priceFilter === '2-3-trieu' && (n < 2000000 || n > 3000000)) return false;
+        if (state.priceFilter === 'tren-3-trieu' && n < 3000000) return false;
+      } else {
+        // Lọc quán ăn/dịch vụ (tính bằng nghìn)
+        if (state.priceFilter === 'duoi-30' && n > 30000) return false;
+        if (state.priceFilter === '30-50' && (n < 30000 || n > 50000)) return false;
+        if (state.priceFilter === 'tren-50' && n < 50000) return false;
+      }
     }
+
+    // 3. Lọc theo khoảng cách (giữ nguyên của bạn)
     if (state.distanceFilter) {
       const d = getDistance(UTT_LOCATION[0], UTT_LOCATION[1], p.lat, p.lng);
       if (state.distanceFilter === 'duoi-500' && d > 500) return false;
       if (state.distanceFilter === '500-1000' && (d < 500 || d > 1000)) return false;
       if (state.distanceFilter === 'tren-1000' && d < 1000) return false;
     }
+
+    // 4. Lọc theo từ khóa
     if (state.keyword) {
       const k = state.keyword.toLowerCase();
       const txt = `${p.name} ${p.description} ${p.address}`.toLowerCase();
@@ -53,6 +69,7 @@ function getFiltered() {
     return true;
   });
 
+  // Sắp xếp (giữ nguyên của bạn)
   if (state.sortBy === 'price-asc') places.sort((a, b) => extractPriceNumber(a.price) - extractPriceNumber(b.price));
   else if (state.sortBy === 'price-desc') places.sort((a, b) => extractPriceNumber(b.price) - extractPriceNumber(a.price));
   else if (state.sortBy === 'name') places.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
@@ -76,8 +93,10 @@ function renderCategoryFilter() {
   el.querySelectorAll('.filter-btn').forEach(b => {
     b.onclick = () => {
       state.category = b.dataset.cat || null;
+      state.priceFilter = null;
       updateTitle();
       renderCategoryFilter();
+      renderPriceFilter();
       renderPlaces();
     };
   });
@@ -86,19 +105,34 @@ function renderCategoryFilter() {
 function renderPriceFilter() {
   const el = document.getElementById('priceFilter');
   if (!el) return;
-  const opts = [
-    { id: null, l: 'Tất cả' },
-    { id: 'duoi-30', l: 'Dưới 30.000đ' },
-    { id: '30-50', l: '30.000 - 50.000đ' },
-    { id: 'tren-50', l: 'Trên 50.000đ' }
-  ];
-  el.innerHTML = opts.map(o => `
-    <label class="flex items-center gap-2 cursor-pointer text-sm p-1.5 rounded hover:bg-gray-50 dark:hover:bg-gray-700">
-      <input type="radio" name="price" value="${o.id || ''}" ${state.priceFilter === o.id ? 'checked' : ''} class="accent-blue-600">
-      <span>${o.l}</span>
-    </label>`).join('');
-  el.querySelectorAll('input[name="price"]').forEach(r => {
-    r.onchange = () => { state.priceFilter = r.value || null; renderPlaces(); };
+
+  // Nếu là nhà trọ thì hiện mức giá theo TRIỆU, ngược lại hiện theo NGHÌN
+  const options = state.category === 'nha-tro'
+    ? [
+        { id: null, label: 'Tất cả mức thuê', icon: '💰' },
+        { id: 'duoi-2-trieu', label: 'Dưới 2 triệu/tháng', icon: '💵' },
+        { id: '2-3-trieu', label: '2 - 3 triệu/tháng', icon: '💴' },
+        { id: 'tren-3-trieu', label: 'Trên 3 triệu/tháng', icon: '💸' }
+      ]
+    : [
+        { id: null, label: 'Tất cả mức giá', icon: '💰' },
+        { id: 'duoi-30', label: 'Dưới 30.000đ', icon: '💵' },
+        { id: '30-50', label: '30.000 - 50.000đ', icon: '💴' },
+        { id: 'tren-50', label: 'Trên 50.000đ', icon: '💸' }
+      ];
+
+  el.innerHTML = options.map(opt => `
+    <label class="flex items-center gap-2 cursor-pointer text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700">
+      <input type="radio" name="price" value="${opt.id || ''}" ${state.priceFilter === opt.id ? 'checked' : ''} class="accent-blue-600">
+      <span>${opt.icon} ${opt.label}</span>
+    </label>
+  `).join('');
+
+  el.querySelectorAll('input[name="price"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      state.priceFilter = radio.value || null;
+      renderPlaces();
+    });
   });
 }
 
@@ -159,7 +193,7 @@ function renderPlaces() {
       'an-uong': 'bg-orange-100 text-orange-700', 'in-an': 'bg-blue-100 text-blue-700',
       'sua-chua': 'bg-gray-100 text-gray-700', 'nha-thuoc': 'bg-red-100 text-red-700',
       'cua-hang': 'bg-green-100 text-green-700', 'hoc-tap': 'bg-purple-100 text-purple-700',
-      'khac': 'bg-yellow-100 text-yellow-700'
+      'nha-tro': 'bg-rose-100 text-rose-700','khac': 'bg-yellow-100 text-yellow-700'
     }[p.category] || 'bg-gray-100 text-gray-700';
     const isFav = Favorites.has(p.id);
     const isVisited = Visited.has(p.id);

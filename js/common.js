@@ -52,7 +52,23 @@ const Ratings = {
 
 const History = {
   KEY: 'utt_history', MAX: 10,
-  getAll() { try { return JSON.parse(localStorage.getItem(this.KEY)) || []; } catch { return []; } },
+  getAll() { 
+    try { 
+      const ids = JSON.parse(localStorage.getItem(this.KEY)) || [];
+      
+      // Lọc bỏ các ID không tồn tại trong danh sách địa điểm hiện tại
+      if (typeof PLACES !== 'undefined' && PLACES.length > 0) {
+        const validIds = ids.filter(id => PLACES.some(p => p.id === id));
+        if (validIds.length !== ids.length) {
+          localStorage.setItem(this.KEY, JSON.stringify(validIds));
+        }
+        return validIds;
+      }
+      return ids;
+    } catch { 
+      return []; 
+    } 
+  },
   add(id) {
     let h = this.getAll().filter(x => x !== id);
     h.unshift(id); if (h.length > this.MAX) h = h.slice(0, this.MAX);

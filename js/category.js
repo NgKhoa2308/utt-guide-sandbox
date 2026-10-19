@@ -296,3 +296,12 @@ document.addEventListener('DOMContentLoaded',async  () => {
   });
   document.getElementById('nearMeBtn')?.addEventListener('click', findNearMe);
 });
+
+// Tự động load lại dữ liệu khi bấm nút Quay lại (Back)
+window.addEventListener('pageshow', (event) => {
+  if (typeof initPlacesFromAPI === 'function') {
+    initPlacesFromAPI().then(() => {
+      if (typeof renderPlaces === 'function') renderPlaces();
+    });
+  }
+});

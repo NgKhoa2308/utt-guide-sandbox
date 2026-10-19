@@ -193,21 +193,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Bắt sự kiện khi người dùng bấm nút Back của trình duyệt quay về trang chủ
+// Tự động load lại dữ liệu khi bấm nút Quay lại (Back)
 window.addEventListener('pageshow', (event) => {
-  // event.persisted = true nghĩa là trang được load từ bộ nhớ đệm (BFCache)
-  if (event.persisted) {
-    console.log("Trang được load từ cache, đang tải lại dữ liệu...");
-    
-    // Gọi lại API để lấy số view mới nhất
-    if (typeof initPlacesFromAPI === 'function') {
-      initPlacesFromAPI().then(() => {
-        renderCategories();
-        renderFeatured();
-        renderHistory();
-        updateStats();
-        initMap(); // Nếu muốn map cũng cập nhật lại
-      });
-    }
+  // Không cần quan tâm event.persisted là true hay false, cứ hiển thị lại là load data mới
+  if (typeof initPlacesFromAPI === 'function') {
+    initPlacesFromAPI().then(() => {
+      if (typeof renderFeatured === 'function') renderFeatured();
+      if (typeof renderHistory === 'function') renderHistory();
+      if (typeof updateStats === 'function') updateStats();
+    });
   }
 });
 

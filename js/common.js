@@ -115,8 +115,14 @@ function showToast(msg, type = 'success') {
   setTimeout(() => { t.classList.add('translate-y-4', 'opacity-0'); setTimeout(() => t.remove(), 300); }, 2200);
 }
 
-function extractPriceNumber(s) { const m = s.replace(/\./g, '').match(/\d+/); return m ? parseInt(m[0]) : 0; }
-
+function extractPriceNumber(priceStr) {
+  if (!priceStr) return 0;
+  // Tìm cụm số đầu tiên trong chuỗi (VD: "20.000" trong "20.000 - 30.000đ")
+  const match = String(priceStr).match(/\d+(?:[.,]\d+)*/);
+  if (!match) return 0;
+  // Bỏ dấu chấm/phẩy và chuyển thành số nguyên
+  return parseInt(match[0].replace(/[.,]/g, ''));
+}
 function getDistance(lat1, lng1, lat2, lng2) {
   const R = 6371000;
   const dLat = (lat2 - lat1) * Math.PI / 180;

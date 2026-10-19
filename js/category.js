@@ -32,13 +32,15 @@ function updateTitle() {
 
 function getFiltered() {
   let places = PLACES.filter(p => {
+    // 1. Lọc theo danh mục
     if (state.category && p.category !== state.category) return false;
-    // Lọc theo giá
+
+    // 2. Lọc theo giá
     if (state.priceFilter) {
-      const n = extractPriceNumber(place.price);
+      const n = extractPriceNumber(p.price);
       
       if (state.category === 'nha-tro') {
-        // Lọc nhà trọ (tính bằng VNĐ)
+        // Lọc nhà trọ (tính bằng triệu)
         if (state.priceFilter === 'duoi-2-trieu' && n > 2000000) return false;
         if (state.priceFilter === '2-3-trieu' && (n < 2000000 || n > 3000000)) return false;
         if (state.priceFilter === 'tren-3-trieu' && n < 3000000) return false;
@@ -49,12 +51,16 @@ function getFiltered() {
         if (state.priceFilter === 'tren-50' && n < 50000) return false;
       }
     }
+
+    // 3. Lọc theo khoảng cách (giữ nguyên của bạn)
     if (state.distanceFilter) {
       const d = getDistance(UTT_LOCATION[0], UTT_LOCATION[1], p.lat, p.lng);
       if (state.distanceFilter === 'duoi-500' && d > 500) return false;
       if (state.distanceFilter === '500-1000' && (d < 500 || d > 1000)) return false;
       if (state.distanceFilter === 'tren-1000' && d < 1000) return false;
     }
+
+    // 4. Lọc theo từ khóa
     if (state.keyword) {
       const k = state.keyword.toLowerCase();
       const txt = `${p.name} ${p.description} ${p.address}`.toLowerCase();
@@ -63,6 +69,7 @@ function getFiltered() {
     return true;
   });
 
+  // Sắp xếp (giữ nguyên của bạn)
   if (state.sortBy === 'price-asc') places.sort((a, b) => extractPriceNumber(a.price) - extractPriceNumber(b.price));
   else if (state.sortBy === 'price-desc') places.sort((a, b) => extractPriceNumber(b.price) - extractPriceNumber(a.price));
   else if (state.sortBy === 'name') places.sort((a, b) => a.name.localeCompare(b.name, 'vi'));

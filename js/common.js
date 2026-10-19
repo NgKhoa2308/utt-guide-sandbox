@@ -255,7 +255,7 @@ function createPlaceCard(place) {
   const isFav = Favorites.has(place.id);
   const isVisited = Visited.has(place.id);
   const r = Ratings.get(place.id);
-  const v = Views.get(place.id);
+  const v = place.view_count || 0;
   const img = getPlaceImage(place);
 
   return `

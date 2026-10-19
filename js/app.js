@@ -210,3 +210,25 @@ window.addEventListener('pageshow', (event) => {
     }
   }
 });
+
+// ==========================================
+// TỰ ĐỘNG CẬP NHẬT KHI BẤM NÚT QUAY LẠI (BACK)
+// ==========================================
+window.addEventListener('pageshow', (event) => {
+  // Nếu trang được load từ bộ nhớ đệm (BFCache)
+  if (event.persisted) {
+    console.log("Trang được phục hồi từ cache, đang tải lại dữ liệu...");
+    
+    // Gọi lại API để lấy số view mới nhất
+    if (typeof initPlacesFromAPI === 'function') {
+      initPlacesFromAPI().then(() => {
+        // Vẽ lại toàn bộ giao diện với dữ liệu mới
+        if (typeof renderFeatured === 'function') renderFeatured();
+        if (typeof renderHistory === 'function') renderHistory();
+        if (typeof updateStats === 'function') updateStats();
+        // Nếu đang ở trang danh mục thì vẽ lại danh sách
+        if (typeof renderPlaces === 'function') renderPlaces(); 
+      });
+    }
+  }
+});

@@ -1,4 +1,4 @@
-// Tọa độ trường UTT Hà Nội: 54 Triều Khúc, Thanh Xuân Nam, Thanh Xuân, Hà Nội
+// Tọa độ trường UTT Hà Nội: 54 Triều Khúc, Thanh Liệt Nam, Thanh Xuân, Hà Nội
 const UTT_LOCATION = [20.9809, 105.8016];
 
 const CATEGORIES = [
@@ -17,7 +17,7 @@ let PLACES = [
     id: 1,
     name: 'Quán Cơm Sinh Viên Triều Khúc',
     category: 'an-uong',
-    address: 'Ngõ 54 Triều Khúc, Thanh Xuân Nam, Hà Nội',
+    address: 'Ngõ 54 Triều Khúc, Thanh Liệt Nam, Hà Nội',
     price: '20.000 - 30.000đ',
     hours: '10:00 - 21:00',
     lat: 20.9815,

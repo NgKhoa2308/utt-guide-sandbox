@@ -58,10 +58,7 @@ function initMap() {
   if (!el) return;
   const map = L.map('map').setView(UTT_LOCATION, 15);
   const street = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri', maxZoom: 19 });
-  const sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri', maxZoom: 19 });
   street.addTo(map);
-  L.control.layers({ '🗺️ Đường phố': street, '🛰️ Vệ tinh': sat }, null, { position: 'topright' }).addTo(map);
-
   const markers = L.markerClusterGroup({
     showCoverageOnHover: false, maxClusterRadius: 50, spiderfyOnMaxZoom: true,
     iconCreateFunction: c => L.divIcon({
